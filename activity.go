@@ -4,6 +4,25 @@ import (
 	"encoding/json"
 )
 
+type Activitystream struct {
+	Stream []Activity
+}
+
+func (a Activitystream) ToJson() ([]byte, error) {
+	activtyAsjson, err := json.Marshal(a)
+	if err != nil {
+		return nil, err
+	}
+	return activtyAsjson, nil
+}
+
+func (a Activitystream) FromJson(activities string) error {
+	if err := json.Unmarshal([]byte(activities), a); err != nil {
+		return err
+	}
+	return nil
+}
+
 type Activity struct {
 	Id        string
 	Verb      string
@@ -18,6 +37,14 @@ type Activity struct {
 	Url       string `json:",omitempty"`
 }
 
+func (a Activity) ToJsonSteam() ([]byte, error) {
+	astream := &Activitystream{
+		Stream: make([]Activity, 0),
+	}
+	astream.Stream = append(astream.Stream, a)
+	return astream.ToJson()
+}
+
 type Object struct {
 	Id          string  `json:",omitempty"`
 	Title       string  `json:",omitempty"`
@@ -26,12 +53,4 @@ type Object struct {
 	ObjectType  string  `json:",omitempty"`
 	Actor       *Object `json:",omitempty"`
 	Object      *Object `json:",omitempty"`
-}
-
-func (a Activity) AsJson() ([]byte, error) {
-	json, err := json.Marshal(a)
-	if err != nil {
-		return nil, err
-	}
-	return json, nil
 }
